@@ -18,3 +18,7 @@
 ## Finally:
 1. One group member should make a push replacing this readme text with the skeleton of your readme document.
 2. All other group members should pull down this change (`git pull origin main`)
+
+> For next steps, take a look back at the "Project Setup" lesson in the DRF content.
+>
+> Try and get the most minimal possible app deployed ASAP, using the DRF "Deployment" lesson. Even just an endpoint that only returns "Hello world" is a good way to start. Only one person needs to get the deployment set up, and after that other people should be able to merge feature branches into `main` as described on the Thinkific notes.
