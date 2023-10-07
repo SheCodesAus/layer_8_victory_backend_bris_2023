@@ -15,7 +15,6 @@ class Event(models.Model):
         related_name='event_modified'
     )
 
-
 class EventMentors(models.Model):
     event_id = models.ForeignKey(
         'Event',
