@@ -14,3 +14,12 @@ class EventMentorsSerializer(serializers.ModelSerializer):
 
 class EventDetailSerializer(EventSerializer):
   event_mentors = EventMentorsSerializer(many=True)
+
+  def update(self,instance,validated_data):
+    instance.title = validated_data.get('title', instance.title)
+    instance.start_date = validated_data.get('start_date', instance.start_date)
+    instance.end_date = validated_data.get('end_date', instance.end_date)
+    instance.location = validated_data.get('location', instance.location)
+    instance.is_published = validated_data.get('is_published', instance.is_published)
+    instance.save()
+    return instance
