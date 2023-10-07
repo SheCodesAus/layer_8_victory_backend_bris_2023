@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import CustomUser
-from django.contrib.auth.validators import ASCIIUsernameValidator
 
 class CustomUserSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.id')
