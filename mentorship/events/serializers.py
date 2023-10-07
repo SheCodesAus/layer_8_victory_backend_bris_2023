@@ -11,3 +11,6 @@ class EventMentorsSerializer(serializers.ModelSerializer):
   class Meta:
     model = apps.get_model('events.EventMentors')
     fields = '__all__'
+
+class EventDetailSerializer(EventSerializer):
+  event_mentors = EventMentorsSerializer(many=True)
