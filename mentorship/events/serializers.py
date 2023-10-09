@@ -8,6 +8,8 @@ class EventSerializer(serializers.ModelSerializer):
     fields = '__all__'
 
 class EventMentorsSerializer(serializers.ModelSerializer):
+  modified_by = serializers.ReadOnlyField(source='modified_by.id')
+  created_by = serializers.ReadOnlyField(source='created_by.id')
   class Meta:
     model = apps.get_model('events.EventMentors')
     fields = '__all__'

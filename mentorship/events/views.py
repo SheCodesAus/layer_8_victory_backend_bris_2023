@@ -67,6 +67,7 @@ class EventDetail(APIView):
 
 
 class EventMentorList(APIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     def get(self, request):
         if request.user.is_staff:
             event_mentors = EventMentors.objects.all()
@@ -74,3 +75,22 @@ class EventMentorList(APIView):
             event_mentors = EventMentors.objects.all().filter(confirmed=True)
         serializer = EventMentorsSerializer(event_mentors, many=True)
         return Response(serializer.data)
+    
+    def post(self,request):
+        # Do we want mentors to be able to add availability if event is still in draft mode?
+        serializer = EventMentorsSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            if request.user.is_staff:
+                serializer.save(
+                    created_by=request.user,
+                    modified_by=request.user
+                )
+            else:
+                serializer.save(
+                    mentor_id = request.user,
+                    created_by=request.user,
+                    modified_by=request.user
+                )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
