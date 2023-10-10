@@ -26,3 +26,11 @@ class EventDetailSerializer(EventSerializer):
     instance.is_published = validated_data.get('is_published', instance.is_published)
     instance.save()
     return instance
+
+class EventMentorsDetailSerializer(EventMentorsSerializer):
+
+  def update(self,instance,validated_data):
+    instance.confirmed = validated_data.get('confirmed', instance.confirmed)
+    instance.available = validated_data.get('available', instance.available)
+    instance.save()
+    return instance

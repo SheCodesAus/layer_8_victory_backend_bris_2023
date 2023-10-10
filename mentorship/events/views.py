@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.http import Http404
 from django.db.models import Prefetch
 from .models import Event, EventMentors
-from .serializers import EventSerializer, EventMentorsSerializer, EventDetailSerializer
+from .serializers import EventSerializer, EventMentorsSerializer, EventDetailSerializer,EventMentorsDetailSerializer
 from .permissions import IsSuperAdmin, CustomIsAdmin
 
 
@@ -75,7 +75,6 @@ class EventMentorList(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        # Do we want mentors to be able to add availability if event is still in draft mode?
         serializer = EventMentorsSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -84,5 +83,36 @@ class EventMentorList(APIView):
                 created_by=request.user,
                 modified_by=request.user,
             )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class EventMentorDetail(APIView):
+    permission_classes = [CustomIsAdmin]
+
+    def get_object(self,pk):
+        try:
+            if self.request.user.is_staff:
+                event_mentors = EventMentors.objects.all()
+            else:
+                event_mentors = EventMentors.objects.all().filter(mentor_id=self.request.user.id)
+            event_mentor = event_mentors.get(pk=pk)
+            self.check_object_permissions(self.request,event_mentor)
+            return event_mentor
+        except EventMentors.DoesNotExist:
+            raise Http404
+
+
+    def get(self, request, pk):
+        event_mentor = self.get_object(pk)
+        serializer = EventMentorsDetailSerializer(event_mentor)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        event_mentor = self.get_object(pk)
+        serializer = EventMentorsDetailSerializer(
+            instance=event_mentor, data=request.data, partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
