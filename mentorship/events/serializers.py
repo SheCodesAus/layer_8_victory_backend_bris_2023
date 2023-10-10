@@ -8,6 +8,7 @@ class EventSerializer(serializers.ModelSerializer):
     fields = '__all__'
 
 class EventMentorsSerializer(serializers.ModelSerializer):
+  mentor_id = serializers.ReadOnlyField(source='mentor_id.id')
   modified_by = serializers.ReadOnlyField(source='modified_by.id')
   created_by = serializers.ReadOnlyField(source='created_by.id')
   class Meta:
