@@ -6,11 +6,21 @@ from .models import CustomUser
 from .serializers import CustomUserSerializer
 
 class UserList(APIView):
-    def get(self, request):
-        users = CustomUser.objects.all()
-        serializer = CustomUserSerializer(users, many=True)
-        return Response(serializer.data)
-
+    def get(self,request):
+        if request.user.is_staff:
+            users = CustomUser.objects.all()
+            serializer = CustomUserSerializer(users, many=True)
+            return Response(serializer.data)
+        elif request.user.is_authenticated:
+            users = CustomUser.objects.all().filter(pk=self.request.user.id)
+            serializer = CustomUserSerializer(users, many=True)
+            return Response(serializer.data)
+        else:
+            return Response(
+                { "detail": "You do not have permission to perform this action." }, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
     def post(self, request):
         serializer = CustomUserSerializer(data=request.data)
         if serializer.is_valid():
