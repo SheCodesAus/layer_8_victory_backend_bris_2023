@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import CustomUser
 from .serializers import CustomUserSerializer
+from .permissions import UserDetailPermission
 
 class UserList(APIView):
     def get(self,request):
@@ -29,9 +30,13 @@ class UserList(APIView):
         return Response(serializer.errors)
 
 class UserDetail(APIView):
+    permission_classes = [UserDetailPermission]
+
     def get_object(self, pk):
         try:
-            return CustomUser.objects.get(pk=pk)
+            user = CustomUser.objects.get(pk=pk)
+            self.check_object_permissions(self.request,user)
+            return user
         except CustomUser.DoesNotExist:
             raise Http404
         
