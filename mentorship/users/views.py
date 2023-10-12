@@ -2,16 +2,26 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import CustomUser
+from .models import CustomUser, Skill
 from .serializers import CustomUserSerializer
 
 class UserList(APIView):
+
+    def get_queryset(self):
+        skills = self.request.data['skills']
+        skill_ids = []
+        for skill in skills:
+            skill_ob = Skill.objects.get(name=skill)
+            skill_ids.append((skill_ob.id))
+        return skill_ids
+
     def get(self, request):
         users = CustomUser.objects.all()
         serializer = CustomUserSerializer(users, many=True)
         return Response(serializer.data)
 
     def post(self, request):
+        request.data['skills'] = self.get_queryset()
         serializer = CustomUserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
