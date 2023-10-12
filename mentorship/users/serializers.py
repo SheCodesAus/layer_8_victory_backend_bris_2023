@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser, Skill
 
 class CustomUserSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.id')
     class Meta:
         model = CustomUser
-        fields = fields = ('username', 'first_name', 'last_name','password', 'email',
+        fields = ('username', 'first_name', 'last_name','password', 'email',
                   'mobile', 'location', 'cv', 'skills', 'social_account', 'linkedin_account','user')
         extra_kwargs = {'password': {'write_only': True}, 'email' : {'required': True}}
     
