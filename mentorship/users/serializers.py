@@ -24,7 +24,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
         instance.mobile = validated_data.get('mobile',instance.mobile)
         instance.location = validated_data.get('location',instance.location)
         instance.cv = validated_data.get('cv',instance.cv)
-        instance.skills = validated_data.get('skills',instance.skills)
         instance.social_account = validated_data.get('social_account',instance.social_account)
         instance.linkedin_account = validated_data.get('linkedin_account',instance.linkedin_account)
         instance.save()
