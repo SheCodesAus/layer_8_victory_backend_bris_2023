@@ -1,14 +1,25 @@
 from rest_framework import serializers
 from .models import CustomUser, Skill
 
+class SkillSerilalizer(serializers.ModelSerializer):
+    class Meta:
+        model = Skill
+        fields = ("name",)
+
 class CustomUserSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.id')
+    skills = serializers.SerializerMethodField()
+
     class Meta:
         model = CustomUser
         fields = ('username', 'first_name', 'last_name','password', 'email',
                   'mobile', 'location', 'cv', 'skills', 'social_account', 'linkedin_account','user')
         extra_kwargs = {'password': {'write_only': True}, 'email' : {'required': True}}
-    
+
+    def get_skills(self, obj):
+        skills = Skill.objects.filter(user_profiles=obj.id)
+        return SkillSerilalizer(skills,many=True).data
+
     def validate_username(self, value):
         if CustomUser.objects.filter(username__iexact=value).exists():
             raise serializers.ValidationError("A user with this username already exists.")
