@@ -3,6 +3,7 @@ from django.apps import apps
 
 class EventSerializer(serializers.ModelSerializer):
   modified_by = serializers.ReadOnlyField(source='modified_by.id')
+  created_by = serializers.ReadOnlyField(source='created_by.id')
   class Meta:
     model = apps.get_model('events.Event')
     fields = '__all__'
