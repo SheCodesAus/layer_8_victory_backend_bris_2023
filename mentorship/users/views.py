@@ -13,9 +13,10 @@ class UserList(APIView):
             serializer = CustomUserSerializer(users, many=True)
             return Response(serializer.data)
         elif request.user.is_authenticated:
-            users = CustomUser.objects.all().filter(pk=self.request.user.id)
-            serializer = CustomUserSerializer(users, many=True)
-            return Response(serializer.data)
+            users = CustomUser.objects.all().get(pk=self.request.user.id)
+            data = CustomUserSerializer.get_restricted_data(users)
+            serializer = CustomUserSerializer(users, data=data,many=True)
+            return Response(serializer.initial_data)
         else:
             return Response(
                 { "detail": "You do not have permission to perform this action." }, 
