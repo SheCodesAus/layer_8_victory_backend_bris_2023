@@ -77,14 +77,20 @@ class EventMentorList(APIView):
     def post(self, request):
         serializer = EventMentorsSerializer(data=request.data)
 
-        if serializer.is_valid():
-            serializer.save(
-                mentor_id=request.user,
-                created_by=request.user,
-                modified_by=request.user,
-            )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # I think we may need to break out the assignment of mentor_id below, so that
+        # an is_staff usertype can assign mentors to an event as well as mentors self-assigning
+        # - eg Lachlan also has the option to manually assign mentors a, b, c to event x.
+
+        if Event.objects.get(id=request.data['event_id']).is_published:
+            if serializer.is_valid():
+                serializer.save(
+                    mentor_id=request.user,
+                    created_by=request.user,
+                    modified_by=request.user,
+                )
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response("Event must be published before a mentor can be assigned", status=status.HTTP_400_BAD_REQUEST)
 
 class EventMentorDetail(APIView):
     permission_classes = [CustomIsAdmin]
