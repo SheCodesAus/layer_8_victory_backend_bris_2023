@@ -36,9 +36,24 @@ class UserList(APIView):
         request.data['skills'] = self.get_queryset()
         serializer = CustomUserSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors)
+            if request.user.is_staff:
+                serializer.save()
+            else:
+                serializer.save(
+                    is_staff=False,
+                    is_superuser=False,
+                    private_notes=None,
+                    onboarding_status="Applied",
+                    rank="Junior"
+                )
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 class UserDetail(APIView):
     permission_classes = [UserDetailPermission]
