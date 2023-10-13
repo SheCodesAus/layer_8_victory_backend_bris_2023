@@ -16,22 +16,9 @@ class CustomUserSerializerRead(serializers.ModelSerializer):
         fields = "__all__"
         extra_kwargs = {'password': {'write_only': True}, 'email' : {'required': True}}
     
-    def get_restricted_data(self):
-        return {
-            'id': self.id,
-            'username': self.username,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'email': self.email,
-            'mobile': self.mobile,
-            'location': self.location,
-            'cv': self.cv,
-            'skills': self.skills,
-            'social_account': self.social_account,
-            'linkedin_account': self.linkedin_account,
-            'rank': self.rank,
-            'date_joined': self.date_joined
-        }
+    def get_skills(self, obj):
+        skills = Skill.objects.filter(user_profiles=obj.id)
+        return SkillSerilalizer(skills, many=True).data
 
 class CustomUserSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.id')
