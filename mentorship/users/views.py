@@ -3,10 +3,19 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import CustomUser
-from .serializers import CustomUserSerializer
+from .serializers import CustomUserSerializer, CustomUserSerializerRead
 from .permissions import UserDetailPermission
 
 class UserList(APIView):
+
+    def get_queryset(self):
+        skills = self.request.data['skills']
+        skill_ids = []
+        for skill in skills:
+            skill_ob = Skill.objects.get(name=skill)
+            skill_ids.append((skill_ob.id))
+        return skill_ids
+
     def get(self,request):
         if request.user.is_staff:
             users = CustomUser.objects.all()
@@ -21,8 +30,9 @@ class UserList(APIView):
                 { "detail": "You do not have permission to perform this action." }, 
                 status=status.HTTP_401_UNAUTHORIZED
             )
-        
+
     def post(self, request):
+        request.data['skills'] = self.get_queryset()
         serializer = CustomUserSerializer(data=request.data)
         if serializer.is_valid():
             if request.user.is_staff:
@@ -46,6 +56,14 @@ class UserList(APIView):
 
 class UserDetail(APIView):
     permission_classes = [UserDetailPermission]
+    
+    def get_queryset(self):
+        skills = self.request.data['skills']
+        skill_ids = []
+        for skill in skills:
+            skill_ob = Skill.objects.get(name=skill)
+            skill_ids.append((skill_ob.id))
+        return skill_ids
 
     def get_object(self, pk):
         try:
@@ -57,11 +75,12 @@ class UserDetail(APIView):
         
     def get(self, request, pk):
         user = self.get_object(pk)
-        serializer = CustomUserSerializer(user)
+        serializer = CustomUserSerializerRead(user)
         return Response(serializer.data)
     
     def put(self,request,pk):
-        user = self.get_object(pk)      
+        user = self.get_object(pk)
+        request.data['skills'] = self.get_queryset()
         serializer = CustomUserSerializer(
             instance=user,
             data=request.data,
