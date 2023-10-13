@@ -44,7 +44,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'password', 'first_name', 'last_name','password', 'email',
+        fields = ('username', 'password', 'first_name', 'last_name', 'email',
                   'mobile', 'location', 'cv', 'skills', 'social_account', 'linkedin_account','user',)
         extra_kwargs = {'password': {'write_only': True}, 'email' : {'required': True}}
 
@@ -81,7 +81,6 @@ class CustomUserSerializer(serializers.ModelSerializer):
         instance.mobile = validated_data.get('mobile',instance.mobile)
         instance.location = validated_data.get('location',instance.location)
         instance.cv = validated_data.get('cv',instance.cv)
-        #instance.skills = validated_data.get('skills',instance.skills)
         instance.social_account = validated_data.get('social_account',instance.social_account)
         instance.linkedin_account = validated_data.get('linkedin_account',instance.linkedin_account)
 
@@ -92,6 +91,23 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
-    
+
+    def get_restricted_data(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'mobile': self.mobile,
+            'location': self.location,
+            'cv': self.cv,
+            'skills': self.skills,
+            'social_account': self.social_account,
+            'linkedin_account': self.linkedin_account,
+            'rank': self.rank,
+            'date_joined': self.date_joined
+        }
+
 
     

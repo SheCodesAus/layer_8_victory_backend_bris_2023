@@ -22,7 +22,6 @@ class UserList(APIView):
 
     def post(self, request):
         request.data['skills'] = self.get_queryset()
-        print(request.data)
         serializer = CustomUserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
