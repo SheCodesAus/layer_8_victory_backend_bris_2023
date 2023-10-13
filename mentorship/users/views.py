@@ -2,7 +2,7 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import CustomUser
+from .models import CustomUser, Skill
 from .serializers import CustomUserSerializer, CustomUserSerializerRead
 from .permissions import UserDetailPermission
 
@@ -19,11 +19,11 @@ class UserList(APIView):
     def get(self,request):
         if request.user.is_staff:
             users = CustomUser.objects.all()
-            serializer = CustomUserSerializer(users, many=True)
+            serializer = CustomUserSerializerRead(users, many=True)
             return Response(serializer.data)
         elif request.user.is_authenticated:
             users = CustomUser.objects.all().filter(pk=self.request.user.id)
-            serializer = CustomUserSerializer(users, many=True)
+            serializer = CustomUserSerializerRead(users, many=True)
             return Response(serializer.data)
         else:
             return Response(
