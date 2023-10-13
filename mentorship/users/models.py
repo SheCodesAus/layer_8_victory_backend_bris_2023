@@ -7,6 +7,7 @@ class CustomUser(AbstractUser):
   skills = models.ManyToManyField(
         to='users.Skill',  # use a string in the format `app_name.model_name` to reference models to avoid issues using the model before it was defined
         related_name='user_profiles',  # the name for that relation from the point of view of a skill
+        null=True
     )
   onboarding_status = models.CharField(
       max_length=200,

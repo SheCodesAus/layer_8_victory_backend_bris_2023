@@ -19,12 +19,12 @@ class UserList(APIView):
     def get(self,request):
         if request.user.is_staff:
             users = CustomUser.objects.all()
-            serializer = CustomUserSerializer(users, many=True)
+            serializer = CustomUserSerializerRead(users, many=True)
             return Response(serializer.data)
         elif request.user.is_authenticated:
-            users = CustomUser.objects.all().get(pk=self.request.user.id)
+            users = CustomUser.objects.get(pk=self.request.user.id)
             data = CustomUserSerializer.get_restricted_data(users)
-            serializer = CustomUserSerializer(users, data=data,many=True)
+            serializer = CustomUserSerializerRead(users, data=data)
             return Response(serializer.initial_data)
         else:
             return Response(
@@ -63,7 +63,7 @@ class UserDetail(APIView):
         user = self.get_object(pk)
         self.check_object_permissions(self.request,user)
         if request.user.is_staff:
-            serializer = CustomUserSerializer(user)
+            serializer = CustomUserSerializerRead(user)
             return Response(serializer.data)
         else:
             data = CustomUserSerializer.get_restricted_data(user)
