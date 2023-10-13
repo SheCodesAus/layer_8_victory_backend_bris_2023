@@ -77,14 +77,18 @@ class EventMentorList(APIView):
     def post(self, request):
         serializer = EventMentorsSerializer(data=request.data)
 
-        if serializer.is_valid():
-            serializer.save(
-                mentor_id=request.user,
-                created_by=request.user,
-                modified_by=request.user,
-            )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if Event.objects.get(id=request.data['event_id']).is_published:
+            if serializer.is_valid():
+                serializer.save(
+                    mentor_id=request.user,
+                    created_by=request.user,
+                    modified_by=request.user,
+                )
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+                {"detail": "Event must be published before a mentor can be assigned."},
+                status=status.HTTP_400_BAD_REQUEST)
 
 class EventMentorDetail(APIView):
     permission_classes = [CustomIsAdmin]
