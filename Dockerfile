@@ -14,7 +14,6 @@ RUN set -ex && \
     pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt && \
     rm -rf /root/.cache/
-
 COPY mentorship/ /code/
 
 RUN python manage.py collectstatic --noinput
@@ -22,4 +21,4 @@ RUN chmod +x /code/run.sh
 
 EXPOSE 8000
 
-CMD ["code/run.sh"]
+CMD ["/code/run.sh"]
