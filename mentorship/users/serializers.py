@@ -93,7 +93,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'mobile': self.mobile,
             'location': self.location,
             'cv': self.cv,
-            'skills': self.skills,
+            'skills': SkillSerilalizer(Skill.objects.filter(user_profiles=self.id), many=True).data,
             'social_account': self.social_account,
             'linkedin_account': self.linkedin_account,
             'rank': self.rank,

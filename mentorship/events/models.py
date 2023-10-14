@@ -5,8 +5,6 @@ class Event(models.Model):
     title = models.CharField(max_length=200)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
-    # we should have some validation to check that end date is after start date.
-    # Would that be best achieved in front end or back end?
     location = models.CharField(max_length=200)
     is_published = models.BooleanField(default=True)
     date_created = models.DateTimeField(auto_now_add=True)
