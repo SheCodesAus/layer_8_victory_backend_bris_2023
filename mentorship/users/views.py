@@ -22,9 +22,10 @@ class UserList(APIView):
             serializer = CustomUserSerializerRead(users, many=True)
             return Response(serializer.data)
         elif request.user.is_authenticated:
-            users = CustomUser.objects.all().filter(pk=self.request.user.id)
-            serializer = CustomUserSerializerRead(users, many=True)
-            return Response(serializer.data)
+            users = CustomUser.objects.get(pk=self.request.user.id)
+            data = CustomUserSerializer.get_restricted_data(users)
+            serializer = CustomUserSerializerRead(users, data=data)
+            return Response(serializer.initial_data)
         else:
             return Response(
                 { "detail": "You do not have permission to perform this action." }, 
@@ -73,10 +74,16 @@ class UserDetail(APIView):
         except CustomUser.DoesNotExist:
             raise Http404
         
-    def get(self, request, pk):
+    def get(self,request,pk):
         user = self.get_object(pk)
-        serializer = CustomUserSerializerRead(user)
-        return Response(serializer.data)
+        self.check_object_permissions(self.request,user)
+        if request.user.is_staff:
+            serializer = CustomUserSerializerRead(user)
+            return Response(serializer.data)
+        else:
+            data = CustomUserSerializer.get_restricted_data(user)
+            serializer = CustomUserSerializer(user,data=data)
+            return Response(serializer.initial_data)
     
     def put(self,request,pk):
         user = self.get_object(pk)
