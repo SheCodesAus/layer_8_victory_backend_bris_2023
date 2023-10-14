@@ -70,11 +70,11 @@ class CustomUserSerializer(serializers.ModelSerializer):
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.email = validated_data.get('email', instance.email)
-        instance.mobile = validated_data.get('mobile',instance.mobile)
-        instance.location = validated_data.get('location',instance.location)
-        instance.cv = validated_data.get('cv',instance.cv)
-        instance.social_account = validated_data.get('social_account',instance.social_account)
-        instance.linkedin_account = validated_data.get('linkedin_account',instance.linkedin_account)
+        instance.mobile = validated_data.get('mobile', instance.mobile)
+        instance.location = validated_data.get('location', instance.location)
+        instance.cv = validated_data.get('cv', instance.cv)
+        instance.social_account = validated_data.get('social_account', instance.social_account)
+        instance.linkedin_account = validated_data.get('linkedin_account', instance.linkedin_account)
         instance.skills.clear()
 
         for skillset in validated_data.get('skills'):
@@ -127,3 +127,27 @@ class CustomStaffSerializer(serializers.ModelSerializer):
         for skillset in validated_data.get('skills'):
             user.skills.add(skillset.id)
         return user
+
+    def update(self,instance,validated_data):
+        instance.username = validated_data.get('username', instance.username)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.email = validated_data.get('email', instance.email)
+        instance.mobile = validated_data.get('mobile',instance.mobile)
+        instance.location = validated_data.get('location', instance.location)
+        instance.cv = validated_data.get('cv', instance.cv)
+        instance.social_account = validated_data.get('social_account', instance.social_account)
+        instance.linkedin_account = validated_data.get('linkedin_account', instance.linkedin_account)
+        instance.is_superuser = validated_data.get('is_superuser',instance.is_superuser)
+        instance.is_staff = validated_data.get('is_staff', instance.is_staff)
+        instance.rank = validated_data.get('rank', instance.rank)
+        instance.private_notes = validated_data.get('private_notes', instance.private_notes)
+        instance.onboarding_status = validated_data.get('onboarding_status', instance.onboarding_status)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
+        instance.skills.clear()
+
+        for skillset in validated_data.get('skills'):
+            instance.skills.add(skillset.id)
+
+        instance.save()
+        return instance

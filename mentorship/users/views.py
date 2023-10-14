@@ -91,11 +91,18 @@ class UserDetail(APIView):
     def put(self,request,pk):
         user = self.get_object(pk)
         request.data['skills'] = self.get_queryset()
-        serializer = CustomUserSerializer(
-            instance=user,
-            data=request.data,
-            partial=True
-        )
+        if request.user.is_staff:
+            serializer = CustomStaffSerializer(
+                instance=user,
+                data=request.data,
+                partial=True
+            )
+        else:
+            serializer = CustomUserSerializer(
+                instance=user,
+                data=request.data,
+                partial=True
+            )
         if serializer.is_valid():
             serializer.save()
             return Response(
