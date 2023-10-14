@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import CustomUser, Skill
-from .serializers import CustomUserSerializer, CustomUserSerializerRead
+from .serializers import CustomUserSerializer, CustomUserSerializerRead, CustomStaffSerializer
 from .permissions import UserDetailPermission
 
 class UserList(APIView):
@@ -34,7 +34,10 @@ class UserList(APIView):
 
     def post(self, request):
         request.data['skills'] = self.get_queryset()
-        serializer = CustomUserSerializer(data=request.data)
+        if request.user.is_staff:
+            serializer = CustomStaffSerializer(data=request.data)
+        else:
+            serializer = CustomUserSerializer(data=request.data)
         if serializer.is_valid():
             if request.user.is_staff:
                 serializer.save()

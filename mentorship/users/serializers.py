@@ -101,4 +101,29 @@ class CustomUserSerializer(serializers.ModelSerializer):
         }
 
 
-    
+class CustomStaffSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.id')
+    class Meta:
+        model = CustomUser
+        fields = "__all__"
+        extra_kwargs = {'password': {'write_only': True}, 'email' : {'required': True}}
+
+    def create(self,validated_data):
+        user = CustomUser.objects.create_user(
+            username=validated_data.get('username'),
+            password=validated_data.get('password'),
+            first_name=validated_data.get('first_name'),
+            last_name=validated_data.get('last_name'),
+            email=validated_data.get('email'),
+            mobile=validated_data.get('mobile'),
+            location=validated_data.get('location'),
+            cv=validated_data.get('cv'),
+            social_account=validated_data.get('social_account'),
+            linkedin_account=validated_data.get('linkedin_account'),
+            onboarding_status=validated_data.get('onboarding_status'),
+            rank=validated_data.get('rank'),
+            private_notes=validated_data.get('private_notes')
+        )
+        for skillset in validated_data.get('skills'):
+            user.skills.add(skillset.id)
+        return user
