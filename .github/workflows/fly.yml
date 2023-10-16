@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - 33-events-error-500-in-production
 jobs:
   deploy:
     name: Deploy app
