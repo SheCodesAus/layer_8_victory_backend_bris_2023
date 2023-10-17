@@ -113,3 +113,18 @@ class UserDetail(APIView):
             serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+
+class CurrentUserView(APIView):
+    def get(self, request):
+        if request.user.is_staff:
+            serializer = CustomUserSerializerRead(request.user)
+            return Response(serializer.data)
+        elif request.user.is_authenticated:
+            data = CustomUserSerializer.get_restricted_data(request.user)
+            serializer = CustomUserSerializer(request.user,data=data)
+            return Response(serializer.initial_data)
+        else:
+            return Response(
+                { "detail": "You are not currently logged in." }, 
+                status=status.HTTP_404_NOT_FOUND
+            )
