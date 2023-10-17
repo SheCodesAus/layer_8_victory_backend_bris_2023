@@ -6,7 +6,7 @@ from django.db.models import Prefetch
 from .models import Event, EventMentors
 from users.models import CustomUser
 from .serializers import EventSerializer, EventMentorsSerializer, EventDetailSerializer,EventMentorsDetailSerializer
-from .permissions import IsSuperAdmin, CustomIsAdmin
+from .permissions import IsSuperAdmin, CustomIsAdmin, IsValidMentor
 
 
 class EventList(APIView):
@@ -65,7 +65,10 @@ class EventDetail(APIView):
 
 
 class EventMentorList(APIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        IsValidMentor
+    ]
 
     def get(self, request):
         if request.user.is_staff:
@@ -77,21 +80,22 @@ class EventMentorList(APIView):
 
     def post(self, request):
         serializer = EventMentorsSerializer(data=request.data)
-
         if request.user.is_staff:
             mentor_id_switch = CustomUser.objects.get(id=request.data['mentor_id'])
         else:
             mentor_id_switch = request.user
-
-        if Event.objects.get(id=request.data['event_id']).is_published:
-            if serializer.is_valid():
-                serializer.save(
-                    mentor_id=mentor_id_switch,
-                    created_by=request.user,
-                    modified_by=request.user,
-                )
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if EventMentors.objects.filter(mentor_id=mentor_id_switch, event_id=request.data['event_id']).exists() == False:
+            return Response("This mentor is already associated with this event", status=status.HTTP_400_BAD_REQUEST)
+        else: 
+            if Event.objects.get(id=request.data['event_id']).is_published:
+                if serializer.is_valid():
+                    serializer.save(
+                        mentor_id=mentor_id_switch,
+                        created_by=request.user,
+                        modified_by=request.user,
+                    )
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response("Event must be published before a mentor can be assigned", status=status.HTTP_400_BAD_REQUEST)
 
 class EventMentorDetail(APIView):
