@@ -34,6 +34,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'mobile', 
             'location', 
             'github_profile', 
+            'has_mentored',
             'skills', 
             'social_account', 
             'linkedin_account',
@@ -57,6 +58,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             mobile=validated_data.get('mobile'),
             location=validated_data.get('location'),
             github_profile=validated_data.get('github_profile'),
+            has_mentored = validated_data.get('has_mentored'),
             social_account=validated_data.get('social_account'),
             linkedin_account=validated_data.get('linkedin_account')
         )
@@ -73,6 +75,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         instance.mobile = validated_data.get('mobile', instance.mobile)
         instance.location = validated_data.get('location', instance.location)
         instance.github_profile = validated_data.get('github_profile', instance.github_profile)
+        instance.has_mentored = validated_data.get('has_mentored', instance.has_mentored)
         instance.social_account = validated_data.get('social_account', instance.social_account)
         instance.linkedin_account = validated_data.get('linkedin_account', instance.linkedin_account)
         instance.skills.clear()
@@ -93,6 +96,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'mobile': self.mobile,
             'location': self.location,
             'github_profile': self.github_profile,
+            'has_mentored':self.has_mentored,
             'skills': SkillSerilalizer(Skill.objects.filter(user_profiles=self.id), many=True).data,
             'social_account': self.social_account,
             'linkedin_account': self.linkedin_account,
@@ -118,6 +122,7 @@ class CustomStaffSerializer(serializers.ModelSerializer):
             mobile=validated_data.get('mobile'),
             location=validated_data.get('location'),
             github_profile=validated_data.get('github_profile'),
+            has_mentored = validated_data.get('has_mentored'),
             social_account=validated_data.get('social_account'),
             linkedin_account=validated_data.get('linkedin_account'),
             onboarding_status=validated_data.get('onboarding_status'),
@@ -136,6 +141,7 @@ class CustomStaffSerializer(serializers.ModelSerializer):
         instance.mobile = validated_data.get('mobile',instance.mobile)
         instance.location = validated_data.get('location', instance.location)
         instance.github_profile = validated_data.get('github_profile', instance.github_profile)
+        instance.has_mentored = validated_data.get('has_mentored', instance.has_mentored)
         instance.social_account = validated_data.get('social_account', instance.social_account)
         instance.linkedin_account = validated_data.get('linkedin_account', instance.linkedin_account)
         instance.is_superuser = validated_data.get('is_superuser',instance.is_superuser)
