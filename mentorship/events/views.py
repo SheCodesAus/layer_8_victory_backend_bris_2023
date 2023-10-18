@@ -124,3 +124,10 @@ class EventMentorDetail(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class MyEvents(APIView):
+    def get(self, request):
+        current_user = CustomUser.objects.get(id=request.user.id)
+        my_events = EventMentors.objects.filter(mentor_id=current_user)
+        serializer = EventMentorsSerializer(my_events, many=True)
+        return Response(serializer.data)
