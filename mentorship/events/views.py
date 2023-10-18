@@ -5,8 +5,8 @@ from django.http import Http404
 from django.db.models import Prefetch
 from .models import Event, EventMentors
 from users.models import CustomUser
-from .serializers import EventSerializer, EventMentorsSerializer, EventDetailSerializer,EventMentorsDetailSerializer
-from .permissions import IsSuperAdmin, CustomIsAdmin
+from .serializers import EventSerializer, EventMentorsSerializer, EventDetailSerializer,EventMentorsDetailSerializer, MyEventsDetailSerializer
+from .permissions import IsSuperAdmin, CustomIsAdmin, IsEventMentor
 
 
 class EventList(APIView):
@@ -29,7 +29,10 @@ class EventList(APIView):
 
 
 class EventDetail(APIView):
-    permission_classes = [CustomIsAdmin]
+    permission_classes = [
+        CustomIsAdmin,
+        IsEventMentor
+    ]
 
     def get_object(self, pk):
         try:
@@ -55,9 +58,18 @@ class EventDetail(APIView):
 
     def put(self, request, pk):
         event = self.get_object(pk)
-        serializer = EventDetailSerializer(
-            instance=event, data=request.data, partial=True
-        )
+        if self.request.user.is_staff:
+            serializer = EventDetailSerializer(
+                instance=event, 
+                data=request.data, 
+                partial=True
+            )
+        else:
+            serializer = MyEventsDetailSerializer(
+                instance=event, 
+                data=request.data, 
+                partial=True
+            )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

@@ -35,3 +35,9 @@ class EventMentorsDetailSerializer(EventMentorsSerializer):
     instance.available = validated_data.get('available', instance.available)
     instance.save()
     return instance
+
+class MyEventsDetailSerializer(EventMentorsSerializer):
+    def update(self,instance,validated_data):
+      instance.available = validated_data.get('available', instance.available)
+      instance.save()
+      return instance
