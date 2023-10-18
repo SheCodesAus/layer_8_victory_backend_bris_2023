@@ -33,6 +33,8 @@ class EventMentorsDetailSerializer(EventMentorsSerializer):
   def update(self,instance,validated_data):
     instance.confirmed = validated_data.get('confirmed', instance.confirmed)
     instance.available = validated_data.get('available', instance.available)
+    if instance.available == False:
+        instance.confirmed = False
     instance.save()
     return instance
 
