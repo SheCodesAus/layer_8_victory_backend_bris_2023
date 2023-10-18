@@ -6,7 +6,7 @@ from django.db.models import Prefetch
 from .models import Event, EventMentors
 from users.models import CustomUser
 from .serializers import EventSerializer, EventMentorsSerializer, EventDetailSerializer,EventMentorsDetailSerializer, MyEventsDetailSerializer
-from .permissions import IsSuperAdmin, CustomIsAdmin, IsEventMentor
+from .permissions import IsSuperAdmin, CustomIsAdmin, EventMentorUpdate
 
 
 class EventList(APIView):
@@ -29,10 +29,7 @@ class EventList(APIView):
 
 
 class EventDetail(APIView):
-    permission_classes = [
-        CustomIsAdmin,
-        IsEventMentor
-    ]
+    permission_classes = [CustomIsAdmin]
 
     def get_object(self, pk):
         try:
@@ -58,23 +55,13 @@ class EventDetail(APIView):
 
     def put(self, request, pk):
         event = self.get_object(pk)
-        if self.request.user.is_staff:
-            serializer = EventDetailSerializer(
-                instance=event, 
-                data=request.data, 
-                partial=True
-            )
-        else:
-            serializer = MyEventsDetailSerializer(
-                instance=event, 
-                data=request.data, 
-                partial=True
-            )
+        serializer = EventDetailSerializer(
+            instance=event, data=request.data, partial=True
+        )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class EventMentorList(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -89,12 +76,10 @@ class EventMentorList(APIView):
 
     def post(self, request):
         serializer = EventMentorsSerializer(data=request.data)
-
         if request.user.is_staff:
             mentor_id_switch = CustomUser.objects.get(id=request.data['mentor_id'])
         else:
             mentor_id_switch = request.user
-
         if Event.objects.get(id=request.data['event_id']).is_published:
             if serializer.is_valid():
                 serializer.save(
@@ -107,7 +92,7 @@ class EventMentorList(APIView):
         return Response("Event must be published before a mentor can be assigned", status=status.HTTP_400_BAD_REQUEST)
 
 class EventMentorDetail(APIView):
-    permission_classes = [CustomIsAdmin]
+    permission_classes = [EventMentorUpdate]
 
     def get_object(self,pk):
         try:
@@ -121,17 +106,25 @@ class EventMentorDetail(APIView):
         except EventMentors.DoesNotExist:
             raise Http404
 
-
     def get(self, request, pk):
         event_mentor = self.get_object(pk)
         serializer = EventMentorsDetailSerializer(event_mentor)
         return Response(serializer.data)
 
     def put(self, request, pk):
-        event_mentor = self.get_object(pk)
-        serializer = EventMentorsDetailSerializer(
-            instance=event_mentor, data=request.data, partial=True
-        )
+        event_mentor = self.get_object(pk)  
+        if self.request.user.is_staff:
+            serializer = EventMentorsDetailSerializer(
+                instance = event_mentor,
+                data = request.data,
+                partial = True
+            )
+        else:
+            serializer = MyEventsDetailSerializer(
+                instance = event_mentor,
+                data = request.data,
+                partial = True
+            )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
