@@ -83,7 +83,7 @@ class EventMentorList(APIView):
             mentor_id_switch = CustomUser.objects.get(id=request.data['mentor_id'])
         else:
             mentor_id_switch = request.user
-        if EventMentors.objects.filter(mentor_id=mentor_id_switch, event_id=request.data['event_id']).exists() == False:
+        if EventMentors.objects.filter(mentor_id=mentor_id_switch, event_id=request.data['event_id']).exists() == True:
             return Response("This mentor is already associated with this event", status=status.HTTP_400_BAD_REQUEST)
         else: 
             if Event.objects.get(id=request.data['event_id']).is_published:
