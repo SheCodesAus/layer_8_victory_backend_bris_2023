@@ -13,12 +13,20 @@ class CustomIsAdmin(permissions.BasePermission):
 class IsSuperAdmin(permissions.BasePermission):
   def has_permission(self, request, view):
         return bool(
-            request.method in permissions.SAFE_METHODS or
-            request.user and
-            request.user.is_authenticated and
-            request.user.is_superuser and 
-            request.user.is_staff
+            request.method in permissions.SAFE_METHODS
+            or (
+                request.user
+                and request.user.is_authenticated
+                and request.user.is_superuser
+                and request.user.is_staff
+            )
         )
+
+class EventMentorUpdate(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return bool(obj.mentor_id == request.user or request.user.is_staff)
 
 class IsValidMentor(permissions.BasePermission):
     def has_permission(self, request, view):
