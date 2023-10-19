@@ -146,6 +146,7 @@ class EventMentorDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class MyEvents(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     def get(self, request):
         current_user = CustomUser.objects.get(id=request.user.id)
         my_events = EventMentors.objects.filter(mentor_id=current_user)
