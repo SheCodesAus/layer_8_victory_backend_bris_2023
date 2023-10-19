@@ -29,10 +29,14 @@ class EventMentorUpdate(permissions.BasePermission):
         return bool(obj.mentor_id == request.user or request.user.is_staff)
 
 class IsValidMentor(permissions.BasePermission):
-    def has_object_permission(self, request, view):
-        mentor_id = request.data['mentor_id']
-        user = CustomUser.objects.get(id=mentor_id)
-        return bool(
-            request.user.is_authenticated and
-            user.onboarding_status == "Ready"
-        )
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if request.user.is_staff:
+            mentor_id_switch = CustomUser.objects.get(id=request.data['mentor_id'])
+        else:
+            mentor_id_switch = request.user
+        user = CustomUser.objects.get(id=mentor_id_switch.id)
+        if request.user.is_authenticated and user.onboarding_status == "Ready":
+            return True
+        return False
