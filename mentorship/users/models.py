@@ -42,12 +42,3 @@ class CustomUser(AbstractUser):
 class Skill(models.Model):
     name = models.CharField(max_length=255)
     abbreviation = models.CharField(max_length=255)
-# Uncomment these to insert the skills into the database. Must have server running for these commands to work.
-# Will need to look at a better way of prepopulating the data once when deployed.
-# Skill.objects.create(name="Python", abbreviation="Python")
-# Skill.objects.create(name="Django", abbreviation="Django")
-# Skill.objects.create(name="React", abbreviation="React")
-# Skill.objects.create(name="JavaScript", abbreviation="JavaScript")
-# Skill.objects.create(name="Frontend", abbreviation="Front-end")
-# Skill.objects.create(name="Backend", abbreviation="Back-end")
-# Skill.objects.create(name="HTML-CSS", abbreviation="HTML-CSS")
