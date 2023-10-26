@@ -127,8 +127,12 @@ class CustomStaffSerializer(serializers.ModelSerializer):
             linkedin_account=validated_data.get('linkedin_account'),
             onboarding_status=validated_data.get('onboarding_status'),
             rank=validated_data.get('rank'),
-            private_notes=validated_data.get('private_notes')
+            private_notes=validated_data.get('private_notes'),
+            is_staff=validated_data.get('is_staff'),
+            is_superuser=validated_data.get('is_superuser')
         )
+        if user.is_superuser == True:
+            user.is_staff = True
         for skillset in validated_data.get('skills'):
             user.skills.add(skillset.id)
         return user
@@ -150,6 +154,9 @@ class CustomStaffSerializer(serializers.ModelSerializer):
         instance.private_notes = validated_data.get('private_notes', instance.private_notes)
         instance.onboarding_status = validated_data.get('onboarding_status', instance.onboarding_status)
         instance.is_active = validated_data.get('is_active', instance.is_active)
+
+        if instance.is_superuser == True:
+            instance.is_staff = True
         instance.skills.clear()
 
         for skillset in validated_data.get('skills'):

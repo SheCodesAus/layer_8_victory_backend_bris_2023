@@ -40,8 +40,10 @@ class UserList(APIView):
         else:
             serializer = CustomUserSerializer(data=request.data)
         if serializer.is_valid():
-            if request.user.is_staff:
+            if request.user.is_superuser:
                 serializer.save()
+            elif request.user.is_staff and request.user.is_superuser == False:
+                serializer.save(is_superuser=False)
             else:
                 serializer.save(
                     is_staff=False,
@@ -98,15 +100,25 @@ class UserDetail(APIView):
                 data=request.data,
                 partial=True
             )
+            if serializer.is_valid():
+                if request.user.is_superuser:
+                    serializer.save()
+                else:
+                    serializer.save(is_superuser=user.is_superuser)
+                return Response(
+                    serializer.data,
+                    status=status.HTTP_201_CREATED
+                )
+
         else:
             serializer = CustomUserSerializer(
                 instance=user,
                 data=request.data,
                 partial=True
             )
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
+            if serializer.is_valid():
+                serializer.save()
+                return Response(
                     serializer.data,
                     status=status.HTTP_201_CREATED
                 )
